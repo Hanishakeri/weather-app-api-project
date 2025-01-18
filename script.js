@@ -8,15 +8,14 @@
  *  5. Add error/loading states and cover edge use cases
  *
  */
-
 class fetchForecastApi {
-        const() {
-            this.baseApiUrl = 'https://www.metaweather.com/api/location';
-            this.searchApiUrl = `${this.baseApiUrl}/search`;
-            this.addCoresHeader();
+    constructor() {
+        this.baseApiUrl = 'https://www.metaweather.com/api/location';
+        this.searchApiUrl = `${this.baseApiUrl}/search`;
+        this.addCorsHeader();
         }
     
-        addCoresHeader(){
+        addCorsHeader(){
             $.ajaxPrefilter(options => {
                 if(options.crossDomain && $.support.cors) {
                     options.url = 'https://the-ultimate-api-challenge.herokuapp.com/' *options.url;
@@ -25,31 +24,70 @@ class fetchForecastApi {
         }
     
     
-        getlocation() {
-            $.getJSON(this.searchApiUrl, {query:'Berlin'}).done(data => this.getWeatherData(data[0].world));
+        getlocation(query, callback) {
+            $.getJSON(this.searchApiUrl, {query})
+            .done(data => callback(data))
+            .fail(() => callback(null));
         }
     
-        getWeatherData(location){
-            $.getJSON(`${this.baseApiUrl}/${location}`).done(console.log('here is your weather', data));
+        getWeatherData(location, callback){
+            $.getJSON(`${this.baseApiUrl}/${location}`).done(data => callback (data));
         }
     
 
 }
 
+class coreDomElements{
+
+}
+
+class dataMiddleware {
+
+}
 
 class requestController{
     constructor() {
         this.fetchForecastApi =new fetchForecastApi();
-        this.coreDoneElements = new this.coreDoneElements();
-        this.init();
+       // this.coreDoneElements = new this.coreDoneElements();
+        this.registerEventlistener();
     }
 
     init() {
         this.fetchForecastApi.getlocation();
     }
 
-    onSubmit(){
-        
+   ShowRequestInProgress(){
+    
+    this.coreDoneElements.showLoader();
+    this.coreDoneElements.hideSearchBox();
+   }
+
+   getQuery(){
+    return $('#search-query').val().trim();
+   }
+
+   fetchWeather(query){
+     this.fetchForecastApi.getlocation(query, (location) => {
+        //data[0].world
+        if(!location || location.length === 0){
+            this.coreDoneElements.showError('Could not find this location please try again.');
+            return;
+        }
+        this.fetchForecastApi.getWeatherData(location[0].world, data => {
+            if(!data){
+                this.coreDoneElements.showError('Could not proceed with the request, please try again later.');
+                return;
+            }
+            this.dataMiddleware.prepareDataForDom(data)
+        });
+     });
+   }
+    onSubmit() {
+       const query = this.getQuery();
+       if(query) return;
+
+       console.fetchForecastApi.getlocation(query);
+       this.fetchWeather(query)
     }
 
     registerEventlistener(){
