@@ -42,7 +42,56 @@ class coreDomElements{
 }
 
 class dataMiddleware {
+    gatherTodaysForecastDetails(){
+        return {
+            predictability:{
+                value: data.predictability,
+                unit: 'g',
+            },
+            humidity: {
+                value: data.humidity,
+                unit: '%',
+            },
+            wind: {
+                value: Math.round(data.wind_speed),
+                unit: 'km/h',
+            },
+            'air pressure': {
+                value: data.air_pressure,
+                unit: 'mb',
+            },
+            'max temp': {
+                value: Math.round(data.max_temp),
+                unit: '°C',
+            },
+            'min temp': {
+                value: Math.round(data.min_temp),
+                unit: '°C',
+            },
+        }
+    }
+}
+prepareDataForDom(data){
+    const {
+        predictability,
+        humidity,
+        wind_speed,
+        air_pressure,
+        max_temp,
+        min_temp,
+        applicable_date,
+        the_temp,
+        weather_state_abbr,
+        weather_state_name,
+    } = data.consolidated_weather[0];
 
+    const todaysForecastGeneral = this.gatherTodaysForecastGeneral({
+        applicable_date,
+        weather_state_abbr,
+        weather_state_name,
+        the_temp,
+        title: data.title,
+    });
 }
 
 class requestController{
