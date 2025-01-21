@@ -68,9 +68,9 @@ class dataMiddleware {
                 value: Math.round(data.min_temp),
                 unit: '°C',
             },
-        }
+        };
     }
-}
+
 prepareDataForDom(data){
     const {
         predictability,
@@ -92,12 +92,28 @@ prepareDataForDom(data){
         the_temp,
         title: data.title,
     });
+    const todaysForecastDetails = this.gatherTodaysForecastDetails({
+        predictability,
+        humidity,
+        wind_speed,
+        air_pressure,
+        max_temp,
+        min_temp,
+    });
+    
+    this.displayForecast.showTodaysForecast(todaysForecastGeneral);
+    this.prepareTodaysForecastDetails(todaysForecastDetails);
+    this.prepareUpcomingDaysForecast(data.consolidated_weather);
+    this.coreDomElements.hideLoader();
+    this.coreDomElements.showForecast();
+  }
 }
 
 class requestController{
     constructor() {
         this.fetchForecastApi =new fetchForecastApi();
-       // this.coreDoneElements = new this.coreDoneElements();
+        this.coreDoneElements = new this.coreDoneElements();
+        this.dataMiddleware = new dataMiddleware();
         this.registerEventlistener();
     }
 
